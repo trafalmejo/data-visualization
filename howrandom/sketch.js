@@ -58,7 +58,7 @@ function keyPressed() {
     if (keyCode === DELETE) {
         reset();
     }
-    if (keyCode === SHIFT) {
+    if (keyCode == "32") {
         newRandomCanvas();
     }if(keyCode === ENTER) {
         addRandomDice();
