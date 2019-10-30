@@ -58,7 +58,7 @@ function keyPressed() {
     if (keyCode === DELETE) {
         reset();
     }
-    if (keyCode === BACKSPACE) {
+    if (keyCode === SHIFT) {
         newRandomCanvas();
     }if(keyCode === ENTER) {
         addRandomDice();
