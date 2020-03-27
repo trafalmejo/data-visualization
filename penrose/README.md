@@ -1,4 +1,4 @@
 # PENROSE
 
-[DEMO HERE](https://trafalmejo.github.io/data-visualization/penrose)
+[DEMO HERE](https://trafalmejo.github.io/data-visualization/penrose/index.html)
 
