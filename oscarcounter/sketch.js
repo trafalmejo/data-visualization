@@ -1,87 +1,61 @@
-let windowsCount;
-let macCount;
-let sizeFont;
-var c1, c2;
-// Constants
-const Y_AXIS = 1;
-const X_AXIS = 2;
+// Fullscreen counter: the number grows from 1/6 to 1/2 of the screen width,
+// leaving a trail, then the gradient wipes it and the zoom starts again.
+// app.js drives it through showCounter() / hideCounter().
 
-function preload(){
-    fetchCount()
-}
+let counterValue = null;
+let sizeFont;
+let c1, c2;
+
 function setup() {
-// Sets the screen to be 720 pixels wide and 400 pixels high
-// createCanvas(720, 400);
-canvas = createCanvas(window.innerWidth, window.innerHeight);
-sizeFont = window.innerWidth / 6 
-strokeWeight(10)
-textSize(sizeFont);
-textFont('Helvetica');
-textStyle(BOLD);
-textAlign(CENTER, CENTER);
-  // Define colors
+  const canvas = createCanvas(window.innerWidth, window.innerHeight);
+  canvas.parent('counter-canvas');
+  strokeWeight(10);
+  textFont('Helvetica');
+  textStyle(BOLD);
+  textAlign(CENTER, CENTER);
   c1 = color(255, 46, 99);
   c2 = color(255, 98, 58);
-  setGradient(c1, c2);
-
+  restartZoom();
+  noLoop();
 }
+
 function windowResized() {
-console.log("resized")
-sizeFont = window.innerWidth / 6 
-textSize(sizeFont);
-setGradient(c1, c2);
-fetchCount();
-  }
+  resizeCanvas(window.innerWidth, window.innerHeight);
+  restartZoom();
+}
+
 function draw() {
-    sizeFont+=2;
-    writeNumber()
-    if(sizeFont > window.innerWidth/2){
-        setGradient(c1,c2)
-        sizeFont = window.innerWidth / 6 
-    }
+  sizeFont += 2;
+  writeNumber();
+  if (sizeFont > width / 2) restartZoom();
+}
+
+function restartZoom() {
+  setGradient(c1, c2);
+  sizeFont = width / 6;
 }
 
 function setGradient(c1, c2) {
-    // noprotect
-    noFill();
-    for (var y = 0; y < height; y++) {
-      var inter = map(y, 0, height, 0, 1);
-      var c = lerpColor(c1, c2, inter);
-      stroke(c);
-      line(0, y, width, y);
-    }
+  noFill();
+  for (let y = 0; y < height; y++) {
+    stroke(lerpColor(c1, c2, map(y, 0, height, 0, 1)));
+    line(0, y, width, y);
   }
-function fetchCount(){
-    fetch('https://api.github.com/repos/trafalmejo/OSCAR/releases')
-  .then((response) => {
-    return response.json();
-  })
-  .then((myJson) => {
-    windowsCount = myJson[0].assets[0].download_count
-    macCount = myJson[0].assets[1].download_count
-    console.log("count:", windowsCount+macCount);
-    writeNumber()
-  });
 }
-function writeNumber(){    
-    fill(255)
-    textSize(sizeFont);
-    var total = windowsCount+macCount
-    if(!isNaN(total))
-        text(windowsCount+macCount, window.innerWidth/2, window.innerHeight/2);
+
+function writeNumber() {
+  if (counterValue === null) return;
+  fill(255);
+  textSize(sizeFont);
+  text(counterValue.toLocaleString('en-US'), width / 2, height / 2);
 }
-function keyPressed() {
-    console.log("KeyPressed");
-    if (keyCode === DELETE) {
-        reset();
-    }
-    if (keyCode == "32") {
-    }if(keyCode === ENTER) {
-    }
+
+function showCounter(value) {
+  counterValue = value;
+  restartZoom();
+  loop();
 }
-function mouseClicked() {
-    console.log("MouseClicked");
-}
-function reset(){
-    background(0);
+
+function hideCounter() {
+  noLoop();
 }

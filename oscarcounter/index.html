@@ -1,14 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.sound.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
     <meta charset="utf-8" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OSCAR Downloads</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
   <body>
+    <main id="timeline-view" hidden>
+      <header class="head">
+        <div>
+          <h1>OSCAR downloads</h1>
+          <p class="muted">Installer downloads per release of <a href="https://github.com/trafalmejo/OSCAR/releases">trafalmejo/OSCAR</a></p>
+        </div>
+        <button class="hero" id="open-all" type="button">
+          <span class="hero-label">All releases</span>
+          <span class="hero-value" id="total-all">—</span>
+          <span class="hero-hint">Open fullscreen ›</span>
+        </button>
+      </header>
+
+      <div class="controls">
+        <div class="filters" id="filters" aria-label="Releases shown"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="chart" id="chart">
+        <p class="muted" id="status">Loading releases…</p>
+      </div>
+      <p class="muted note">
+        Bars sit in release order with their publish date underneath. GitHub only keeps a running total per file,
+        not when each download happened. Auto-updater files (.yml, .blockmap) aren't counted.
+        Click a release to open its fullscreen counter.
+      </p>
+
+      <details class="table-view">
+        <summary>Table view</summary>
+        <table id="table"></table>
+      </details>
+    </main>
+
+    <section id="counter-view" hidden>
+      <div id="counter-canvas"></div>
+      <div class="overlay" id="overlay">
+        <a class="pill" href="#/timeline">‹ Timeline</a>
+        <div class="counter-nav">
+          <button class="pill" id="prev" type="button" aria-label="Previous release">‹</button>
+          <div class="counter-label">
+            <span id="counter-name"></span>
+            <span class="counter-date" id="counter-date"></span>
+          </div>
+          <button class="pill" id="next" type="button" aria-label="Next release">›</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="tooltip" id="tooltip" role="status" hidden></div>
+
+    <script src="data.js"></script>
     <script src="sketch.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>
