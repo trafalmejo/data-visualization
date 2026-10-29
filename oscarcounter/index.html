@@ -12,32 +12,61 @@
       <header class="head">
         <div>
           <h1>OSCAR downloads</h1>
-          <p class="muted">Installer downloads per release of <a href="https://github.com/trafalmejo/OSCAR/releases">trafalmejo/OSCAR</a></p>
+          <p class="muted">Three counts of <a href="https://github.com/trafalmejo/OSCAR">trafalmejo/OSCAR</a>: what GitHub served, what people took from <a href="https://www.createwithoscar.com">the site</a>, and what actually ran.</p>
         </div>
-        <button class="hero" id="open-all" type="button">
-          <span class="hero-label">All releases</span>
-          <span class="hero-value" id="total-all">—</span>
-          <span class="hero-hint">Open fullscreen ›</span>
-        </button>
       </header>
 
-      <div class="controls">
-        <div class="filters" id="filters" aria-label="Releases shown"></div>
-        <div class="legend" id="legend"></div>
+      <div class="signals" aria-label="Totals">
+        <button class="signal primary" id="open-all" type="button">
+          <span class="signal-label">Installer downloads on GitHub</span>
+          <span class="signal-value" id="sig-github">—</span>
+          <span class="signal-hint">every file served, crawlers included · open counter ›</span>
+        </button>
+        <button class="signal" id="open-site" type="button">
+          <span class="signal-label">Downloads from the site</span>
+          <span class="signal-value" id="sig-site">—</span>
+          <span class="signal-hint" id="sig-site-hint">loading…</span>
+        </button>
+        <button class="signal" id="open-installs" type="button">
+          <span class="signal-label">Installs that launched</span>
+          <span class="signal-value" id="sig-installs">—</span>
+          <span class="signal-hint" id="sig-installs-hint">loading…</span>
+        </button>
       </div>
-      <div class="chart" id="chart">
-        <p class="muted" id="status">Loading releases…</p>
-      </div>
-      <p class="muted note">
-        Bars sit in release order with their publish date underneath. GitHub only keeps a running total per file,
-        not when each download happened. Auto-updater files (.yml, .blockmap) aren't counted.
-        Click a release to open its fullscreen counter.
-      </p>
 
-      <details class="table-view">
-        <summary>Table view</summary>
-        <table id="table"></table>
-      </details>
+      <section class="daily" id="daily" hidden>
+        <div class="controls">
+          <h2>Day by day</h2>
+          <div class="legend" id="daily-legend"></div>
+        </div>
+        <div class="chart" id="daily-chart"></div>
+        <p class="muted note">
+          A download from the site is one click on a download button by a person; crawlers, link previews and
+          scripts are left out. An install is the first time a copy of OSCAR was opened, counted by the app's
+          anonymous telemetry, which anyone can switch off. Neither is tied to the other.
+        </p>
+      </section>
+
+      <section class="releases">
+        <div class="controls">
+          <h2>By release, from GitHub</h2>
+          <div class="legend" id="legend"></div>
+        </div>
+        <div class="filters" id="filters" aria-label="Releases shown"></div>
+        <div class="chart" id="chart">
+          <p class="muted" id="status">Loading releases…</p>
+        </div>
+        <p class="muted note">
+          Bars sit in release order with their publish date underneath. GitHub only keeps a running total per file,
+          not when each download happened, and cannot tell a person from a crawler. Auto-updater files (.yml, .blockmap)
+          aren't counted. Click a release to open its fullscreen counter.
+        </p>
+
+        <details class="table-view">
+          <summary>Table view</summary>
+          <table id="table"></table>
+        </details>
+      </section>
     </main>
 
     <section id="counter-view" hidden>
@@ -45,12 +74,12 @@
       <div class="overlay" id="overlay">
         <a class="pill" href="#/timeline">‹ Timeline</a>
         <div class="counter-nav">
-          <button class="pill" id="prev" type="button" aria-label="Previous release">‹</button>
+          <button class="pill" id="prev" type="button" aria-label="Previous counter">‹</button>
           <div class="counter-label">
             <span id="counter-name"></span>
             <span class="counter-date" id="counter-date"></span>
           </div>
-          <button class="pill" id="next" type="button" aria-label="Next release">›</button>
+          <button class="pill" id="next" type="button" aria-label="Next counter">›</button>
         </div>
       </div>
     </section>

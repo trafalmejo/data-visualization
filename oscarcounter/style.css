@@ -11,6 +11,8 @@
   --series-windows: #2a78d6;
   --series-mac: #eb6834;
   --series-linux: #1baf7a;
+  --series-site: #7c5cff;
+  --series-installs: #ff2e63;
   --accent-1: #ff2e63;
   --accent-2: #ff623a;
 }
@@ -28,6 +30,8 @@
     --series-windows: #3987e5;
     --series-mac: #d95926;
     --series-linux: #199e70;
+    --series-site: #8f74ff;
+    --series-installs: #ff3d6e;
   }
 }
 :root[data-theme="dark"] {
@@ -43,6 +47,8 @@
   --series-windows: #3987e5;
   --series-mac: #d95926;
   --series-linux: #199e70;
+  --series-site: #8f74ff;
+  --series-installs: #ff3d6e;
 }
 
 html, body {
@@ -74,22 +80,42 @@ a { color: inherit; }
 h1 { margin: 0 0 4px; font-size: 28px; }
 .head p { margin: 0; font-size: 14px; }
 
-.hero {
+/* The three totals. The GitHub one keeps the gradient: it is the number the page always had. */
+.signals {
   display: grid;
-  text-align: right;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.signal {
+  display: grid;
+  text-align: left;
   gap: 2px;
-  padding: 12px 18px;
-  border: 0;
+  padding: 14px 18px;
+  border: 1px solid var(--grid);
   border-radius: 12px;
-  background: linear-gradient(180deg, var(--accent-1), var(--accent-2));
-  color: #fff;
+  background: var(--surface-1);
+  color: var(--text-primary);
   cursor: pointer;
   font: inherit;
 }
-.hero:hover, .hero:focus-visible { filter: brightness(1.08); }
-.hero-label { font-size: 13px; opacity: 0.9; }
-.hero-value { font-size: 36px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.hero-hint { font-size: 12px; opacity: 0.9; }
+.signal:hover, .signal:focus-visible { border-color: var(--text-muted); }
+.signal:disabled { cursor: default; }
+.signal:disabled .signal-value { color: var(--text-muted); }
+.signal.primary {
+  border: 0;
+  background: linear-gradient(180deg, var(--accent-1), var(--accent-2));
+  color: #fff;
+}
+.signal.primary:hover, .signal.primary:focus-visible { filter: brightness(1.08); }
+.signal-label { font-size: 13px; opacity: 0.9; }
+.signal-value { font-size: 36px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.signal-hint { font-size: 12px; opacity: 0.85; }
+
+h2 { margin: 0; font-size: 18px; }
+.daily { margin-bottom: 32px; }
+.daily .controls { margin-bottom: 10px; }
+.releases .filters { margin-bottom: 10px; }
 
 .controls {
   display: flex;
