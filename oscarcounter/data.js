@@ -8,8 +8,9 @@
 //   The site  https://www.createwithoscar.com/stats.json, published by the
 //            website itself from OSCAR's anonymous counts: download clicks on
 //            the site's own buttons (people only, crawlers dropped) and
-//            installs that actually launched, each by day. No ids, no
-//            countries, nothing about any one install.
+//            installs that actually launched, each by day, plus how many
+//            installs came back, opened this week or published. No ids,
+//            no countries, nothing about any one install.
 
 const REPO = 'trafalmejo/OSCAR';
 const STATS_URL = 'https://www.createwithoscar.com/stats.json';

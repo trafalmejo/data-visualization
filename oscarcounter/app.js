@@ -62,9 +62,24 @@ function signalEntries() {
       tag: 'installs',
       name: 'Installs that launched',
       date: null,
-      hint: `${fmt(stats.installs.countries)} countries · ${fmt(stats.installs.last7)} opened this week`,
+      hint: `${fmt(stats.installs.countries)} countries · since ${utcDateFormat.format(new Date(stats.installs.since + 'T00:00:00Z'))}`,
       total: stats.installs.total,
     },
+  ];
+}
+
+// What the installs did afterwards, each as a share of them. The one that
+// matters is "came back": an install opened on more than one day is a
+// person using it, not a person trying it. Empty until the site publishes
+// these fields, so an older stats file still renders.
+function installFacts() {
+  const i = stats.installs;
+  if (!i.total || i.cameBack === undefined) return [];
+  const share = (n) => `${Math.round((100 * n) / i.total)}%`;
+  return [
+    { id: 'fact-back', count: i.cameBack, share: share(i.cameBack) },
+    { id: 'fact-week', count: i.last7, share: share(i.last7) },
+    { id: 'fact-published', count: i.published, share: share(i.published) },
   ];
 }
 
@@ -79,6 +94,7 @@ function renderSignals() {
     $('sig-installs-hint').textContent = 'not available right now';
     $('open-site').disabled = true;
     $('open-installs').disabled = true;
+    $('facts').hidden = true;
     return;
   }
   const [site, installs] = signalEntries();
@@ -88,6 +104,12 @@ function renderSignals() {
   $('sig-installs-hint').textContent = `${installs.hint} · open counter ›`;
   $('open-site').disabled = false;
   $('open-installs').disabled = false;
+  const facts = installFacts();
+  for (const f of facts) {
+    $(f.id).textContent = fmt(f.count);
+    $(f.id + '-share').textContent = f.share;
+  }
+  $('facts').hidden = facts.length === 0;
 }
 
 // ---------- Day by day ----------

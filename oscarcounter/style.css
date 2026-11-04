@@ -112,6 +112,20 @@ h1 { margin: 0 0 4px; font-size: 28px; }
 .signal-value { font-size: 36px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .signal-hint { font-size: 12px; opacity: 0.85; }
 
+/* What the installs did afterwards: the part of the count that means people. */
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 28px;
+  margin: -16px 0 28px;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.facts b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.facts .share { opacity: 0.7; }
+
 h2 { margin: 0; font-size: 18px; }
 .daily { margin-bottom: 32px; }
 .daily .controls { margin-bottom: 10px; }

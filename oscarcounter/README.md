@@ -8,13 +8,15 @@ Three counts of [OSCAR](https://github.com/trafalmejo/OSCAR), side by side:
   [createwithoscar.com](https://www.createwithoscar.com) by people. Crawlers, link previews and
   scripts are left out. Counted since 29 October 2026.
 - **Installs that launched**: the first time a copy of OSCAR was opened, from the app's anonymous
-  telemetry (which anyone can switch off). Counted since 25 September 2026.
+  telemetry (which anyone can switch off). Counted since 25 September 2026. Under it, what those
+  installs did: how many came back on another day (the honest "users" number), opened it this week,
+  and published a surface, each as a share of the installs.
 
 [DEMO HERE](https://trafalmejo.github.io/data-visualization/oscarcounter)
 
 ## Views
 
-- **Timeline** (`#/timeline`, default): the three totals, a day-by-day chart of site downloads and
+- **Timeline** (`#/timeline`, default): the three totals, what the installs did, a day-by-day chart of site downloads and
   installs over the last six weeks, then one stacked column per release in release order, split by
   Windows / macOS / Linux. Hover for the breakdown, toggle releases on and off with the chips, and
   click a total or a release to open its counter. A table view is at the bottom.
