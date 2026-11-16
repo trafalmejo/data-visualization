@@ -1,6 +1,6 @@
 # OSCAR DOWNLOADS COUNTER
 
-Three counts of [OSCAR](https://github.com/trafalmejo/OSCAR), side by side:
+Four counts of [OSCAR](https://github.com/trafalmejo/OSCAR), side by side:
 
 - **Installer downloads on GitHub**, per release. The upper bound: GitHub keeps a running total per
   file and cannot tell a person from a crawler.
@@ -11,19 +11,23 @@ Three counts of [OSCAR](https://github.com/trafalmejo/OSCAR), side by side:
   telemetry (which anyone can switch off). Counted since 25 September 2026. Under it, what those
   installs did: how many came back on another day (the honest "users" number), opened it this week,
   and published a surface, each as a share of the installs.
+- **Unique users**: the different installs that opened OSCAR, in the last 30 days as the total and
+  per day in the chart. An install is counted once a day however often it is opened. It is an
+  anonymous id per copy, so a person with OSCAR on a computer and on a phone counts as two.
 
 [DEMO HERE](https://trafalmejo.github.io/data-visualization/oscarcounter)
 
 ## Views
 
-- **Timeline** (`#/timeline`, default): the three totals, what the installs did, a day-by-day chart of site downloads and
-  installs over the last six weeks, then one stacked column per release in release order, split by
+- **Timeline** (`#/timeline`, default): the four totals, what the installs did, a day-by-day chart of site downloads,
+  installs and unique users over the last six weeks, then one stacked column per release in release order, split by
   Windows / macOS / Linux. Hover for the breakdown, toggle releases on and off with the chips, and
   click a total or a release to open its counter. A table view is at the bottom.
 - **Fullscreen counter** (`#/counter/<tag>`): the zooming number animation for one count, e.g.
   [`#/counter/v2.1.0`](https://trafalmejo.github.io/data-visualization/oscarcounter/#/counter/v2.1.0).
   `#/counter/latest` shows the newest release, `#/counter/all` every release combined,
-  `#/counter/site` the site's downloads and `#/counter/installs` the installs that launched.
+  `#/counter/site` the site's downloads, `#/counter/installs` the installs that launched and
+  `#/counter/users` the unique users of the last 30 days.
   Use ← / → to step through them and Esc to go back. The controls fade after 3 seconds.
 
 ## Where the numbers come from
@@ -33,7 +37,7 @@ GitHub's come from its releases API: installer files only (`.exe`, `.dmg`, `.App
 downloads those, not people. GitHub only keeps a running total per file, not when each download
 happened, so releases sit by publish date rather than showing downloads over time.
 
-The other two come from `https://www.createwithoscar.com/stats.json`, which the website publishes
+The others come from `https://www.createwithoscar.com/stats.json`, which the website publishes
 from OSCAR's anonymous counts: totals and per-day numbers only, no ids, no countries, nothing about
 any one install. When it cannot be reached the page shows GitHub's numbers alone.
 

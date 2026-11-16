@@ -9,7 +9,8 @@
 //            website itself from OSCAR's anonymous counts: download clicks on
 //            the site's own buttons (people only, crawlers dropped) and
 //            installs that actually launched, each by day, plus how many
-//            installs came back, opened this week or published. No ids,
+//            installs came back, opened this week or published, and the
+//            unique users: different installs opened per day. No ids,
 //            no countries, nothing about any one install.
 
 const REPO = 'trafalmejo/OSCAR';

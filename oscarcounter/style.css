@@ -13,6 +13,7 @@
   --series-linux: #1baf7a;
   --series-site: #7c5cff;
   --series-installs: #ff2e63;
+  --series-users: #d99a00;
   --accent-1: #ff2e63;
   --accent-2: #ff623a;
 }
@@ -32,6 +33,7 @@
     --series-linux: #199e70;
     --series-site: #8f74ff;
     --series-installs: #ff3d6e;
+    --series-users: #f0b429;
   }
 }
 :root[data-theme="dark"] {
@@ -49,6 +51,7 @@
   --series-linux: #199e70;
   --series-site: #8f74ff;
   --series-installs: #ff3d6e;
+  --series-users: #f0b429;
 }
 
 html, body {
@@ -80,10 +83,10 @@ a { color: inherit; }
 h1 { margin: 0 0 4px; font-size: 28px; }
 .head p { margin: 0; font-size: 14px; }
 
-/* The three totals. The GitHub one keeps the gradient: it is the number the page always had. */
+/* The four totals. The GitHub one keeps the gradient: it is the number the page always had. */
 .signals {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px;
   margin-bottom: 28px;
 }

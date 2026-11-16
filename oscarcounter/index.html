@@ -12,7 +12,7 @@
       <header class="head">
         <div>
           <h1>OSCAR downloads</h1>
-          <p class="muted">Three counts of <a href="https://github.com/trafalmejo/OSCAR">trafalmejo/OSCAR</a>: what GitHub served, what people took from <a href="https://www.createwithoscar.com">the site</a>, and what actually ran.</p>
+          <p class="muted">Four counts of <a href="https://github.com/trafalmejo/OSCAR">trafalmejo/OSCAR</a>: what GitHub served, what people took from <a href="https://www.createwithoscar.com">the site</a>, what actually ran, and how many are using it.</p>
         </div>
       </header>
 
@@ -32,6 +32,11 @@
           <span class="signal-value" id="sig-installs">—</span>
           <span class="signal-hint" id="sig-installs-hint">loading…</span>
         </button>
+        <button class="signal" id="open-users" type="button">
+          <span class="signal-label">Unique users, last 30 days</span>
+          <span class="signal-value" id="sig-users">—</span>
+          <span class="signal-hint" id="sig-users-hint">loading…</span>
+        </button>
       </div>
 
       <ul class="facts" id="facts" hidden aria-label="Of the installs that launched">
@@ -49,7 +54,9 @@
         <p class="muted note">
           A download from the site is one click on a download button by a person; crawlers, link previews and
           scripts are left out. An install is the first time a copy of OSCAR was opened, counted by the app's
-          anonymous telemetry, which anyone can switch off. Neither is tied to the other.
+          anonymous telemetry, which anyone can switch off. Neither is tied to the other. Unique users are the
+          different installs opened that day: one is counted once a day however often it is opened, and a person
+          with OSCAR on a computer and on a phone is two.
         </p>
       </section>
 

@@ -5,6 +5,7 @@
 //   #/counter/all         fullscreen counter for every release combined
 //   #/counter/site        fullscreen counter of download clicks on the site
 //   #/counter/installs    fullscreen counter of installs that launched
+//   #/counter/users       fullscreen counter of unique users in the last 30 days
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const dateFormat = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -46,10 +47,11 @@ function allReleasesEntry() {
   };
 }
 
-// The site's two counts, shaped like a release so the counter can show them.
+// The site's counts, shaped like a release so the counter can show them.
+// Unique users is absent from an older stats file, and then so is its entry.
 function signalEntries() {
   if (!stats) return [];
-  return [
+  const entries = [
     {
       tag: 'site',
       name: 'Downloads from the site',
@@ -66,6 +68,16 @@ function signalEntries() {
       total: stats.installs.total,
     },
   ];
+  if (stats.users) {
+    entries.push({
+      tag: 'users',
+      name: 'Unique users, last 30 days',
+      date: null,
+      hint: `${fmt(stats.users.last7)} in the last 7 days · ${fmt(stats.users.total)} ever`,
+      total: stats.users.last30,
+    });
+  }
+  return entries;
 }
 
 // What the installs did afterwards, each as a share of them. The one that
@@ -92,18 +104,24 @@ function renderSignals() {
     $('sig-installs').textContent = '—';
     $('sig-site-hint').textContent = 'not available right now';
     $('sig-installs-hint').textContent = 'not available right now';
+    $('sig-users').textContent = '—';
+    $('sig-users-hint').textContent = 'not available right now';
     $('open-site').disabled = true;
     $('open-installs').disabled = true;
+    $('open-users').disabled = true;
     $('facts').hidden = true;
     return;
   }
-  const [site, installs] = signalEntries();
+  const [site, installs, users] = signalEntries();
   $('sig-site').textContent = fmt(site.total);
   $('sig-site-hint').textContent = `${site.hint} · open counter ›`;
   $('sig-installs').textContent = fmt(installs.total);
   $('sig-installs-hint').textContent = `${installs.hint} · open counter ›`;
   $('open-site').disabled = false;
   $('open-installs').disabled = false;
+  $('sig-users').textContent = users ? fmt(users.total) : '—';
+  $('sig-users-hint').textContent = users ? `${users.hint} · open counter ›` : 'not available right now';
+  $('open-users').disabled = !users;
   const facts = installFacts();
   for (const f of facts) {
     $(f.id).textContent = fmt(f.count);
@@ -117,6 +135,7 @@ function renderSignals() {
 const DAILY_SERIES = [
   { key: 'site', label: 'Downloads from the site' },
   { key: 'installs', label: 'Installs that launched' },
+  { key: 'users', label: 'Unique users' },
 ];
 const DAILY_DAYS = 42;
 
@@ -142,7 +161,9 @@ function renderDaily() {
     return;
   }
   section.hidden = false;
-  $('daily-legend').innerHTML = DAILY_SERIES.map(
+  // Without unique users in the stats file, the chart keeps its two series.
+  const series = DAILY_SERIES.filter((s) => s.key !== 'users' || stats.users);
+  $('daily-legend').innerHTML = series.map(
     (s) => `<span><i class="swatch" style="background:var(--series-${s.key})"></i>${s.label}</span>`
   ).join('');
 
@@ -151,7 +172,10 @@ function renderDaily() {
   for (const row of stats.clicks.byDay) site[row.day] = row.windows + row.mac + row.linux;
   const installs = {};
   for (const row of stats.installs.byDay) installs[row.day] = row.count;
-  const valueOf = (key, day) => (key === 'site' ? site[day] : installs[day]) || 0;
+  const users = {};
+  for (const row of (stats.users && stats.users.byDay) || []) users[row.day] = row.count;
+  const byKey = { site, installs, users };
+  const valueOf = (key, day) => byKey[key][day] || 0;
 
   const W = Math.max(chart.clientWidth - 16, 300);
   const H = 240;
@@ -159,15 +183,15 @@ function renderDaily() {
   const plotW = W - m.left - m.right;
   const plotH = H - m.top - m.bottom;
 
-  const max = Math.max(1, ...days.map((d) => Math.max(valueOf('site', d), valueOf('installs', d))));
+  const max = Math.max(1, ...days.map((d) => Math.max(...series.map((s) => valueOf(s.key, d)))));
   const step = niceStep(max, 3);
   const yMax = Math.ceil(max / step) * step;
   const y = (v) => m.top + plotH - (v / yMax) * plotH;
 
   const band = plotW / days.length;
-  const barW = Math.max(2, Math.min(14, band * 0.36));
+  const barW = Math.max(2, Math.min(14, (band * 0.76) / series.length));
 
-  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Downloads from the site and installs that launched, per day' }, chart);
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Downloads from the site, installs that launched and unique users, per day' }, chart);
 
   for (let v = 0; v <= yMax; v += step) {
     el('line', { x1: m.left, x2: W - m.right, y1: y(v), y2: y(v), stroke: v === 0 ? 'var(--axis)' : 'var(--grid)', 'stroke-width': 1 }, svg);
@@ -179,10 +203,10 @@ function renderDaily() {
     const cx = m.left + band * (i + 0.5);
     const g = el('g', { class: 'band' }, svg);
     el('rect', { class: 'band-bg', x: m.left + band * i, y: m.top - 12, width: band, height: plotH + 12 + m.bottom - 4, rx: 4, fill: 'transparent' }, g);
-    DAILY_SERIES.forEach((s, j) => {
+    series.forEach((s, j) => {
       const v = valueOf(s.key, day);
       if (!v) return;
-      const x = cx - barW + j * barW;
+      const x = cx - (series.length * barW) / 2 + j * barW;
       el('path', { d: topRoundedRect(x, y(v), barW - 1, y(0) - y(v), 2), fill: `var(--series-${s.key})` }, g);
     });
     // A date every week, on the right-hand edge of the band it names.
@@ -191,7 +215,7 @@ function renderDaily() {
       label.textContent = dayFormat.format(new Date(day + 'T00:00:00Z'));
     }
     g.addEventListener('pointerenter', () => g.querySelector('.band-bg').setAttribute('fill', 'var(--hover)'));
-    g.addEventListener('pointermove', (e) => showDayTooltip(day, valueOf('site', day), valueOf('installs', day), e.clientX, e.clientY));
+    g.addEventListener('pointermove', (e) => showDayTooltip(day, series.map((s) => ({ ...s, value: valueOf(s.key, day) })), e.clientX, e.clientY));
     g.addEventListener('pointerleave', () => {
       g.querySelector('.band-bg').setAttribute('fill', 'transparent');
       hideTooltip();
@@ -199,11 +223,12 @@ function renderDaily() {
   });
 }
 
-function showDayTooltip(day, site, installs, px, py) {
+function showDayTooltip(day, rows, px, py) {
   placeTooltip(
     `<div class="tt-title">${utcDateFormat.format(new Date(day + 'T00:00:00Z'))}</div>` +
-      `<div class="tt-row"><i class="swatch" style="background:var(--series-site)"></i>Downloads from the site<b>${fmt(site)}</b></div>` +
-      `<div class="tt-row"><i class="swatch" style="background:var(--series-installs)"></i>Installs that launched<b>${fmt(installs)}</b></div>`,
+      rows.map(
+        (r) => `<div class="tt-row"><i class="swatch" style="background:var(--series-${r.key})"></i>${r.label}<b>${fmt(r.value)}</b></div>`
+      ).join(''),
     px,
     py
   );
@@ -359,7 +384,7 @@ function renderTable() {
 
 // ---------- Counter ----------
 
-// Navigation order for prev/next: oldest release ... newest release, all combined, then the site's two counts.
+// Navigation order for prev/next: oldest release ... newest release, all combined, then the site's counts.
 function counterSequence() {
   return [...releases, allReleasesEntry(), ...signalEntries()];
 }
@@ -425,6 +450,7 @@ async function init() {
   $('open-all').addEventListener('click', () => (location.hash = '#/counter/all'));
   $('open-site').addEventListener('click', () => (location.hash = '#/counter/site'));
   $('open-installs').addEventListener('click', () => (location.hash = '#/counter/installs'));
+  $('open-users').addEventListener('click', () => (location.hash = '#/counter/users'));
   $('prev').addEventListener('click', () => stepCounter(-1));
   $('next').addEventListener('click', () => stepCounter(1));
   $('counter-view').addEventListener('pointermove', wakeOverlay);
