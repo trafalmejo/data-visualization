@@ -4,8 +4,9 @@
 //   #/counter/latest      fullscreen counter for the newest release
 //   #/counter/all         fullscreen counter for every release combined
 //   #/counter/site        fullscreen counter of download clicks on the site
-//   #/counter/installs    fullscreen counter of installs that launched
-//   #/counter/users       fullscreen counter of unique users in the last 30 days
+//   #/counter/installs    fullscreen counter of desktop installs that launched
+//   #/counter/users       fullscreen counter of desktop unique users in the last 30 days
+//   #/counter/phone-installs, #/counter/phone-users    the same two for the phone app
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const dateFormat = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -47,34 +48,56 @@ function allReleasesEntry() {
   };
 }
 
+// The computer and the phone app are counted apart. Each has the same four
+// ids on the page, the phone's with a prefix: open-phone-installs, phone-facts.
+const KINDS = [
+  { key: 'desktop', label: 'Desktop', prefix: '', installsName: 'Desktop installs that launched', usersName: 'Desktop unique users, last 30 days' },
+  { key: 'phone', label: 'Phone app', prefix: 'phone-', installsName: 'Phone app installs that launched', usersName: 'Phone app unique users, last 30 days' },
+];
+
+// One kind's counts, or null when the stats file has none for it. A file
+// from before the split counts everything together: that is shown as the
+// desktop's, which it nearly all was, and there is no phone group.
+function kindStats(kind) {
+  if (!stats) return null;
+  const i = stats.installs;
+  const u = stats.users;
+  if (!i.desktop) return kind === 'desktop' ? { installs: i, users: u || null } : null;
+  if (!i[kind]) return null;
+  return { installs: i[kind], users: (u && u[kind]) || null };
+}
+
 // The site's counts, shaped like a release so the counter can show them.
-// Unique users is absent from an older stats file, and then so is its entry.
 function signalEntries() {
   if (!stats) return [];
+  const since = (day) => utcDateFormat.format(new Date(day + 'T00:00:00Z'));
   const entries = [
     {
       tag: 'site',
       name: 'Downloads from the site',
       date: null,
-      hint: `people only, since ${utcDateFormat.format(new Date(stats.clicks.since + 'T00:00:00Z'))}`,
+      hint: `people only, since ${since(stats.clicks.since)}`,
       byPlatform: stats.clicks.byPlatform,
       total: stats.clicks.total,
     },
-    {
-      tag: 'installs',
-      name: 'Installs that launched',
-      date: null,
-      hint: `${fmt(stats.installs.countries)} countries · since ${utcDateFormat.format(new Date(stats.installs.since + 'T00:00:00Z'))}`,
-      total: stats.installs.total,
-    },
   ];
-  if (stats.users) {
+  for (const k of KINDS) {
+    const part = kindStats(k.key);
+    if (!part) continue;
     entries.push({
-      tag: 'users',
-      name: 'Unique users, last 30 days',
+      tag: k.prefix + 'installs',
+      name: k.installsName,
       date: null,
-      hint: `${fmt(stats.users.last7)} in the last 7 days · ${fmt(stats.users.total)} ever`,
-      total: stats.users.last30,
+      hint: `since ${since(part.installs.since)}`,
+      total: part.installs.total,
+    });
+    if (!part.users) continue;
+    entries.push({
+      tag: k.prefix + 'users',
+      name: k.usersName,
+      date: null,
+      hint: `${fmt(part.users.last7)} in the last 7 days · ${fmt(part.users.total)} ever`,
+      total: part.users.last30,
     });
   }
   return entries;
@@ -82,62 +105,62 @@ function signalEntries() {
 
 // What the installs did afterwards, each as a share of them. The one that
 // matters is "came back": an install opened on more than one day is a
-// person using it, not a person trying it. Empty until the site publishes
+// person using it, not a person trying it. Publishing is the computer's
+// alone, so the phone has no such line. Empty until the site publishes
 // these fields, so an older stats file still renders.
-function installFacts() {
-  const i = stats.installs;
+function installFacts(i, k) {
   if (!i.total || i.cameBack === undefined) return [];
   const share = (n) => `${Math.round((100 * n) / i.total)}%`;
-  return [
-    { id: 'fact-back', count: i.cameBack, share: share(i.cameBack) },
-    { id: 'fact-week', count: i.last7, share: share(i.last7) },
-    { id: 'fact-published', count: i.published, share: share(i.published) },
+  const facts = [
+    { id: `fact-${k.prefix}back`, count: i.cameBack, share: share(i.cameBack) },
+    { id: `fact-${k.prefix}week`, count: i.last7, share: share(i.last7) },
   ];
+  if (i.published !== undefined) facts.push({ id: `fact-${k.prefix}published`, count: i.published, share: share(i.published) });
+  return facts;
 }
 
 // ---------- Totals ----------
 
 function renderSignals() {
   $('sig-github').textContent = fmt(allReleasesEntry().total);
-  if (!stats) {
-    $('sig-site').textContent = '—';
-    $('sig-installs').textContent = '—';
-    $('sig-site-hint').textContent = 'not available right now';
-    $('sig-installs-hint').textContent = 'not available right now';
-    $('sig-users').textContent = '—';
-    $('sig-users-hint').textContent = 'not available right now';
-    $('open-site').disabled = true;
-    $('open-installs').disabled = true;
-    $('open-users').disabled = true;
-    $('facts').hidden = true;
-    return;
+  const byTag = {};
+  for (const e of signalEntries()) byTag[e.tag] = e;
+  const tags = ['site', ...KINDS.flatMap((k) => [k.prefix + 'installs', k.prefix + 'users'])];
+  for (const tag of tags) {
+    const e = byTag[tag];
+    $('sig-' + tag).textContent = e ? fmt(e.total) : '—';
+    $('sig-' + tag + '-hint').textContent = e ? `${e.hint} · open counter ›` : 'not available right now';
+    $('open-' + tag).disabled = !e;
   }
-  const [site, installs, users] = signalEntries();
-  $('sig-site').textContent = fmt(site.total);
-  $('sig-site-hint').textContent = `${site.hint} · open counter ›`;
-  $('sig-installs').textContent = fmt(installs.total);
-  $('sig-installs-hint').textContent = `${installs.hint} · open counter ›`;
-  $('open-site').disabled = false;
-  $('open-installs').disabled = false;
-  $('sig-users').textContent = users ? fmt(users.total) : '—';
-  $('sig-users-hint').textContent = users ? `${users.hint} · open counter ›` : 'not available right now';
-  $('open-users').disabled = !users;
-  const facts = installFacts();
-  for (const f of facts) {
-    $(f.id).textContent = fmt(f.count);
-    $(f.id + '-share').textContent = f.share;
+  for (const k of KINDS) {
+    const part = kindStats(k.key);
+    if (k.key !== 'desktop') $('group-' + k.key).hidden = !part;
+    const facts = part ? installFacts(part.installs, k) : [];
+    for (const f of facts) {
+      $(f.id).textContent = fmt(f.count);
+      $(f.id + '-share').textContent = f.share;
+    }
+    $(k.prefix + 'facts').hidden = facts.length === 0;
   }
-  $('facts').hidden = facts.length === 0;
+  $('countries').hidden = !stats;
+  if (stats) $('countries-count').textContent = fmt(stats.installs.countries);
 }
 
 // ---------- Day by day ----------
 
+// Downloads are of the computer's installers only: the phone app comes from
+// the stores, which do not say.
 const DAILY_SERIES = [
-  { key: 'site', label: 'Downloads from the site' },
-  { key: 'installs', label: 'Installs that launched' },
-  { key: 'users', label: 'Unique users' },
+  { key: 'site', label: 'Downloads from the site', kinds: ['desktop'] },
+  { key: 'installs', label: 'Installs that launched', kinds: ['desktop', 'phone'] },
+  { key: 'users', label: 'Unique users', kinds: ['desktop', 'phone'] },
 ];
 const DAILY_DAYS = 42;
+
+let dailyKind = readDailyKind();
+function readDailyKind() {
+  try { return localStorage.getItem('oscarcounter:daily') === 'phone' ? 'phone' : 'desktop'; } catch (e) { return 'desktop'; }
+}
 
 // The last six weeks as "YYYY-MM-DD", in UTC, which is what the site counts in.
 function recentDays() {
@@ -152,6 +175,22 @@ function recentDays() {
   return days;
 }
 
+// Desktop or phone: one at a time, so a quiet week of one is not flattened by the other.
+function renderDailyKinds() {
+  const box = $('daily-kind');
+  const both = !!kindStats('phone');
+  box.hidden = !both;
+  if (!both) dailyKind = 'desktop';
+  box.innerHTML = KINDS.map((k) =>
+    `<label class="chip"><input type="radio" name="daily-kind" value="${k.key}" ${k.key === dailyKind ? 'checked' : ''}>${k.label}</label>`
+  ).join('');
+  box.onchange = (e) => {
+    dailyKind = e.target.value;
+    try { localStorage.setItem('oscarcounter:daily', dailyKind); } catch (err) {}
+    renderDaily();
+  };
+}
+
 function renderDaily() {
   const section = $('daily');
   const chart = $('daily-chart');
@@ -161,21 +200,25 @@ function renderDaily() {
     return;
   }
   section.hidden = false;
-  // Without unique users in the stats file, the chart keeps its two series.
-  const series = DAILY_SERIES.filter((s) => s.key !== 'users' || stats.users);
-  $('daily-legend').innerHTML = series.map(
-    (s) => `<span><i class="swatch" style="background:var(--series-${s.key})"></i>${s.label}</span>`
-  ).join('');
+  renderDailyKinds();
 
   const days = recentDays();
+  // A row from before the split has only `count`: all of it the desktop's.
+  const ofKind = (row) => (row[dailyKind] !== undefined ? row[dailyKind] : dailyKind === 'desktop' ? row.count : 0);
   const site = {};
   for (const row of stats.clicks.byDay) site[row.day] = row.windows + row.mac + row.linux;
   const installs = {};
-  for (const row of stats.installs.byDay) installs[row.day] = row.count;
+  for (const row of stats.installs.byDay) installs[row.day] = ofKind(row);
   const users = {};
-  for (const row of (stats.users && stats.users.byDay) || []) users[row.day] = row.count;
+  for (const row of (stats.users && stats.users.byDay) || []) users[row.day] = ofKind(row);
   const byKey = { site, installs, users };
   const valueOf = (key, day) => byKey[key][day] || 0;
+  // Without unique users in the stats file, the chart goes without that series.
+  const series = DAILY_SERIES.filter((s) => s.kinds.includes(dailyKind) && (s.key !== 'users' || stats.users));
+
+  $('daily-legend').innerHTML = series.map(
+    (s) => `<span><i class="swatch" style="background:var(--series-${s.key})"></i>${s.label}</span>`
+  ).join('');
 
   const W = Math.max(chart.clientWidth - 16, 300);
   const H = 240;
@@ -190,8 +233,9 @@ function renderDaily() {
 
   const band = plotW / days.length;
   const barW = Math.max(2, Math.min(14, (band * 0.76) / series.length));
+  const kindLabel = KINDS.find((k) => k.key === dailyKind).label;
 
-  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Downloads from the site, installs that launched and unique users, per day' }, chart);
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `${kindLabel}: ${series.map((s) => s.label.toLowerCase()).join(', ')}, per day` }, chart);
 
   for (let v = 0; v <= yMax; v += step) {
     el('line', { x1: m.left, x2: W - m.right, y1: y(v), y2: y(v), stroke: v === 0 ? 'var(--axis)' : 'var(--grid)', 'stroke-width': 1 }, svg);
@@ -215,7 +259,7 @@ function renderDaily() {
       label.textContent = dayFormat.format(new Date(day + 'T00:00:00Z'));
     }
     g.addEventListener('pointerenter', () => g.querySelector('.band-bg').setAttribute('fill', 'var(--hover)'));
-    g.addEventListener('pointermove', (e) => showDayTooltip(day, series.map((s) => ({ ...s, value: valueOf(s.key, day) })), e.clientX, e.clientY));
+    g.addEventListener('pointermove', (e) => showDayTooltip(day, kindLabel, series.map((s) => ({ ...s, value: valueOf(s.key, day) })), e.clientX, e.clientY));
     g.addEventListener('pointerleave', () => {
       g.querySelector('.band-bg').setAttribute('fill', 'transparent');
       hideTooltip();
@@ -223,9 +267,9 @@ function renderDaily() {
   });
 }
 
-function showDayTooltip(day, rows, px, py) {
+function showDayTooltip(day, kindLabel, rows, px, py) {
   placeTooltip(
-    `<div class="tt-title">${utcDateFormat.format(new Date(day + 'T00:00:00Z'))}</div>` +
+    `<div class="tt-title">${utcDateFormat.format(new Date(day + 'T00:00:00Z'))}</div><div class="tt-date">${kindLabel}</div>` +
       rows.map(
         (r) => `<div class="tt-row"><i class="swatch" style="background:var(--series-${r.key})"></i>${r.label}<b>${fmt(r.value)}</b></div>`
       ).join(''),
@@ -448,9 +492,9 @@ function route() {
 async function init() {
   renderLegend();
   $('open-all').addEventListener('click', () => (location.hash = '#/counter/all'));
-  $('open-site').addEventListener('click', () => (location.hash = '#/counter/site'));
-  $('open-installs').addEventListener('click', () => (location.hash = '#/counter/installs'));
-  $('open-users').addEventListener('click', () => (location.hash = '#/counter/users'));
+  for (const tag of ['site', ...KINDS.flatMap((k) => [k.prefix + 'installs', k.prefix + 'users'])]) {
+    $('open-' + tag).addEventListener('click', () => (location.hash = '#/counter/' + tag));
+  }
   $('prev').addEventListener('click', () => stepCounter(-1));
   $('next').addEventListener('click', () => stepCounter(1));
   $('counter-view').addEventListener('pointermove', wakeOverlay);

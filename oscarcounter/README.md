@@ -1,6 +1,6 @@
 # OSCAR DOWNLOADS COUNTER
 
-Four counts of [OSCAR](https://github.com/trafalmejo/OSCAR), side by side:
+Counts of [OSCAR](https://github.com/trafalmejo/OSCAR), side by side:
 
 - **Installer downloads on GitHub**, per release. The upper bound: GitHub keeps a running total per
   file and cannot tell a person from a crawler.
@@ -15,19 +15,24 @@ Four counts of [OSCAR](https://github.com/trafalmejo/OSCAR), side by side:
   per day in the chart. An install is counted once a day however often it is opened. It is an
   anonymous id per copy, so a person with OSCAR on a computer and on a phone counts as two.
 
+The last two are shown twice, **Desktop** and **Phone app**, because they are different things to
+have installed and only the desktop can publish. The phone app has counted since its version 0.2.0
+(15 November 2026); the stores do not say how many took it, so it has no downloads beside it.
+
 [DEMO HERE](https://trafalmejo.github.io/data-visualization/oscarcounter)
 
 ## Views
 
-- **Timeline** (`#/timeline`, default): the four totals, what the installs did, a day-by-day chart of site downloads,
-  installs and unique users over the last six weeks, then one stacked column per release in release order, split by
+- **Timeline** (`#/timeline`, default): the totals, what the installs did, a day-by-day chart of site downloads,
+  installs and unique users over the last six weeks (desktop or phone app, one at a time), then one stacked column per release in release order, split by
   Windows / macOS / Linux. Hover for the breakdown, toggle releases on and off with the chips, and
   click a total or a release to open its counter. A table view is at the bottom.
 - **Fullscreen counter** (`#/counter/<tag>`): the zooming number animation for one count, e.g.
   [`#/counter/v2.1.0`](https://trafalmejo.github.io/data-visualization/oscarcounter/#/counter/v2.1.0).
   `#/counter/latest` shows the newest release, `#/counter/all` every release combined,
-  `#/counter/site` the site's downloads, `#/counter/installs` the installs that launched and
-  `#/counter/users` the unique users of the last 30 days.
+  `#/counter/site` the site's downloads, `#/counter/installs` the desktop installs that launched,
+  `#/counter/users` the desktop's unique users of the last 30 days, and `#/counter/phone-installs`
+  and `#/counter/phone-users` the same two for the phone app.
   Use ← / → to step through them and Esc to go back. The controls fade after 3 seconds.
 
 ## Where the numbers come from

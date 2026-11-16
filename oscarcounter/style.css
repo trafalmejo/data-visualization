@@ -83,7 +83,7 @@ a { color: inherit; }
 h1 { margin: 0 0 4px; font-size: 28px; }
 .head p { margin: 0; font-size: 14px; }
 
-/* The four totals. The GitHub one keeps the gradient: it is the number the page always had. */
+/* The totals. The GitHub one keeps the gradient: it is the number the page always had. */
 .signals {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -114,6 +114,17 @@ h1 { margin: 0 0 4px; font-size: 28px; }
 .signal-label { font-size: 13px; opacity: 0.9; }
 .signal-value { font-size: 36px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .signal-hint { font-size: 12px; opacity: 0.85; }
+
+/* The desktop and the phone app, side by side: each its two totals and what its installs did. */
+.groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 0 24px;
+}
+.group h2 { margin-bottom: 10px; }
+.group .signals { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.countries { margin: -12px 0 28px; font-size: 14px; }
+.countries b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
 
 /* What the installs did afterwards: the part of the count that means people. */
 .facts {

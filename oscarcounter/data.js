@@ -10,7 +10,8 @@
 //            the site's own buttons (people only, crawlers dropped) and
 //            installs that actually launched, each by day, plus how many
 //            installs came back, opened this week or published, and the
-//            unique users: different installs opened per day. No ids,
+//            unique users: different installs opened per day. The desktop
+//            and the phone app are counted apart. No ids,
 //            no countries, nothing about any one install.
 
 const REPO = 'trafalmejo/OSCAR';

@@ -12,11 +12,11 @@
       <header class="head">
         <div>
           <h1>OSCAR downloads</h1>
-          <p class="muted">Four counts of <a href="https://github.com/trafalmejo/OSCAR">trafalmejo/OSCAR</a>: what GitHub served, what people took from <a href="https://www.createwithoscar.com">the site</a>, what actually ran, and how many are using it.</p>
+          <p class="muted">Counts of <a href="https://github.com/trafalmejo/OSCAR">trafalmejo/OSCAR</a>: what GitHub served, what people took from <a href="https://www.createwithoscar.com">the site</a>, and what actually ran and is in use, on the desktop and in the phone app.</p>
         </div>
       </header>
 
-      <div class="signals" aria-label="Totals">
+      <div class="signals" aria-label="Downloads">
         <button class="signal primary" id="open-all" type="button">
           <span class="signal-label">Installer downloads on GitHub</span>
           <span class="signal-value" id="sig-github">—</span>
@@ -27,36 +27,67 @@
           <span class="signal-value" id="sig-site">—</span>
           <span class="signal-hint" id="sig-site-hint">loading…</span>
         </button>
-        <button class="signal" id="open-installs" type="button">
-          <span class="signal-label">Installs that launched</span>
-          <span class="signal-value" id="sig-installs">—</span>
-          <span class="signal-hint" id="sig-installs-hint">loading…</span>
-        </button>
-        <button class="signal" id="open-users" type="button">
-          <span class="signal-label">Unique users, last 30 days</span>
-          <span class="signal-value" id="sig-users">—</span>
-          <span class="signal-hint" id="sig-users-hint">loading…</span>
-        </button>
       </div>
 
-      <ul class="facts" id="facts" hidden aria-label="Of the installs that launched">
-        <li><b id="fact-back">—</b> came back on another day <span class="share" id="fact-back-share"></span></li>
-        <li><b id="fact-week">—</b> opened it this week <span class="share" id="fact-week-share"></span></li>
-        <li><b id="fact-published">—</b> published a surface <span class="share" id="fact-published-share"></span></li>
-      </ul>
+      <div class="groups">
+        <section class="group" id="group-desktop" aria-label="Desktop">
+          <h2>Desktop</h2>
+          <div class="signals">
+            <button class="signal" id="open-installs" type="button">
+              <span class="signal-label">Installs that launched</span>
+              <span class="signal-value" id="sig-installs">—</span>
+              <span class="signal-hint" id="sig-installs-hint">loading…</span>
+            </button>
+            <button class="signal" id="open-users" type="button">
+              <span class="signal-label">Unique users, last 30 days</span>
+              <span class="signal-value" id="sig-users">—</span>
+              <span class="signal-hint" id="sig-users-hint">loading…</span>
+            </button>
+          </div>
+          <ul class="facts" id="facts" hidden aria-label="Of the desktop installs that launched">
+            <li><b id="fact-back">—</b> came back on another day <span class="share" id="fact-back-share"></span></li>
+            <li><b id="fact-week">—</b> opened it this week <span class="share" id="fact-week-share"></span></li>
+            <li><b id="fact-published">—</b> published a surface <span class="share" id="fact-published-share"></span></li>
+          </ul>
+        </section>
+
+        <section class="group" id="group-phone" hidden aria-label="Phone app">
+          <h2>Phone app</h2>
+          <div class="signals">
+            <button class="signal" id="open-phone-installs" type="button">
+              <span class="signal-label">Installs that launched</span>
+              <span class="signal-value" id="sig-phone-installs">—</span>
+              <span class="signal-hint" id="sig-phone-installs-hint">loading…</span>
+            </button>
+            <button class="signal" id="open-phone-users" type="button">
+              <span class="signal-label">Unique users, last 30 days</span>
+              <span class="signal-value" id="sig-phone-users">—</span>
+              <span class="signal-hint" id="sig-phone-users-hint">loading…</span>
+            </button>
+          </div>
+          <ul class="facts" id="phone-facts" hidden aria-label="Of the phone app installs that launched">
+            <li><b id="fact-phone-back">—</b> came back on another day <span class="share" id="fact-phone-back-share"></span></li>
+            <li><b id="fact-phone-week">—</b> opened it this week <span class="share" id="fact-phone-week-share"></span></li>
+          </ul>
+        </section>
+      </div>
+
+      <p class="muted countries" id="countries" hidden>Opened in <b id="countries-count">—</b> countries, desktop and phone together.</p>
 
       <section class="daily" id="daily" hidden>
         <div class="controls">
           <h2>Day by day</h2>
+          <div class="filters" id="daily-kind" aria-label="Desktop or phone app" hidden></div>
           <div class="legend" id="daily-legend"></div>
         </div>
         <div class="chart" id="daily-chart"></div>
         <p class="muted note">
           A download from the site is one click on a download button by a person; crawlers, link previews and
-          scripts are left out. An install is the first time a copy of OSCAR was opened, counted by the app's
+          scripts are left out. An install is the first time a copy of OSCAR was opened, counted by its
           anonymous telemetry, which anyone can switch off. Neither is tied to the other. Unique users are the
-          different installs opened that day: one is counted once a day however often it is opened, and a person
-          with OSCAR on a computer and on a phone is two.
+          different installs opened that day: one is counted once a day however often it is opened. The desktop
+          and the phone app are counted apart, so a person with both is one of each. The phone app has counted
+          since its version 0.2.0; the stores do not say how many took it.
         </p>
       </section>
 
